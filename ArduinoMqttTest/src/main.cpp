@@ -14,6 +14,7 @@ const char *mqtt_topic1 = "dataCastres/topic1"; // MQTT topic
 const char *mqtt_topic2 = "dataCastres/topic2"; // MQTT topic
 const int mqtt_port = 1883;                     // MQTT port (TCP)
 String client_id = "ArduinoClient-";
+String MAC_address = "";
 
 // Other global variables
 static unsigned long lastPublishTime = 0;
@@ -40,16 +41,16 @@ void printMacAddress()
   WiFi.macAddress(mac);
   for (int i = 0; i < 6; i++)
   {
-    Serial.print(mac[i], HEX);
+    MAC_address += String(mac[i], HEX);
     if (i < 5)
-      Serial.print(":");
+      MAC_address += ":";
     if (mac[i] < 16)
     {
       client_id += "0";
     }
     client_id += String(mac[i], HEX);
   }
-  Serial.println();
+  Serial.println(MAC_address);
 }
 
 void connectToWiFi()
