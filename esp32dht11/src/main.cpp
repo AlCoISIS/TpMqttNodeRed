@@ -8,6 +8,7 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 
+// TODO : Pour compiler ce code, vous devez installer la library "DHT sensor library" de "Adafruit" dans votre IDE.
 #include "DHT.h"
 // Definit la broche de l'Arduino sur laquelle la
 // broche DATA du capteur est reliee
