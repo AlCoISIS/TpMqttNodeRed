@@ -1,0 +1,119 @@
+
+#include "Wire.h"
+
+#define I2C_DEV_ADDR 0x55
+
+// =====================================
+// TABLE DES CODES ERREUR
+// =====================================
+
+#define ERR_NONE              0
+#define ERR_WIFI_LOST         1
+#define ERR_SENSOR_DISCONNECT 2
+#define ERR_SENSOR_READ       3
+#define ERR_TEMP_LIMIT        4
+#define ERR_LOW_VOLTAGE       5
+#define ERR_SERIAL_LOST       6
+#define ERR_LOW_MEMORY        7
+#define ERR_I2C               8
+#define ERR_WATCHDOG           9
+#define ERR_UNKNOWN           10
+
+
+// =====================================
+// CORRESPONDANCE CODE / DESCRIPTION
+// =====================================
+
+const char* getErrorMessage(uint8_t code) {
+
+  switch (code) {
+
+    case ERR_NONE:
+      return "Aucune erreur";
+
+    case ERR_WIFI_LOST:
+      return "Perte du Wifi";
+
+    case ERR_SENSOR_DISCONNECT:
+      return "Capteur non connecte";
+
+    case ERR_SENSOR_READ:
+      return "Erreur de lecture du capteur";
+
+    case ERR_TEMP_LIMIT:
+      return "Temperature hors limites";
+
+    case ERR_LOW_VOLTAGE:
+      return "Tension alimentation insuffisante";
+
+    case ERR_SERIAL_LOST:
+      return "Perte communication serie";
+
+    case ERR_LOW_MEMORY:
+      return "Memoire insuffisante";
+
+    case ERR_I2C:
+      return "Erreur communication I2C";
+
+    case ERR_WATCHDOG:
+      return "Watchdog declenche";
+
+    case ERR_UNKNOWN:
+      return "Erreur systeme inconnue";
+
+    default:
+      return "Code erreur non repertorie";
+  }
+}
+
+
+// =====================================
+// INITIALISATION
+// =====================================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  Wire.begin();
+
+  Serial.println("ESP32 Master initialise");
+}
+
+
+// =====================================
+// BOUCLE PRINCIPALE
+// =====================================
+
+void loop() {
+
+  delay(2000);
+
+  // Demande d'un seul octet au Slave
+  uint8_t bytesReceived = Wire.requestFrom(
+    (uint8_t)I2C_DEV_ADDR,
+    (uint8_t)1
+  );
+
+  if (bytesReceived == 1 && Wire.available()) {
+
+    // Lecture du code erreur
+    uint8_t receivedCode = Wire.read();
+
+    // Affichage du résultat
+    Serial.println("-----------------------------");
+
+    Serial.print("Code erreur : ");
+    Serial.println(receivedCode);
+
+    Serial.print("Description : ");
+    Serial.println(getErrorMessage(receivedCode));
+
+    Serial.println("-----------------------------");
+
+  }
+  else {
+
+    Serial.println("Erreur : aucune reponse du Slave");
+  }
+}
