@@ -1,0 +1,94 @@
+
+#include "Wire.h"
+
+#define I2C_DEV_ADDR 0x55
+
+// =====================================
+// TABLE DES CODES ERREUR
+// =====================================
+
+#define ERR_NONE              0
+#define ERR_WIFI_LOST         1
+#define ERR_SENSOR_DISCONNECT 2
+#define ERR_SENSOR_READ       3
+#define ERR_TEMP_LIMIT        4
+#define ERR_LOW_VOLTAGE       5
+#define ERR_SERIAL_LOST       6
+#define ERR_LOW_MEMORY        7
+#define ERR_I2C               8
+#define ERR_WATCHDOG           9
+#define ERR_UNKNOWN           10
+
+// Code erreur actuel
+uint8_t errorCode = ERR_NONE;
+
+
+// =====================================
+// FONCTION DE RECEPTION I2C
+// =====================================
+
+void onReceive(int len) {
+
+  Serial.printf("Commande reçue du Master : ");
+
+  while (Wire.available()) {
+    Serial.write(Wire.read());
+  }
+
+  Serial.println();
+}
+
+
+// =====================================
+// FONCTION D'ENVOI I2C
+// =====================================
+
+void onRequest() {
+
+  Wire.write(errorCode);
+
+  Serial.print("Code erreur transmis : ");
+  Serial.println(errorCode);
+}
+
+
+// =====================================
+// INITIALISATION
+// =====================================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  Wire.onReceive(onReceive);
+  Wire.onRequest(onRequest);
+
+  Wire.begin((uint8_t)I2C_DEV_ADDR);
+
+  Serial.println("ESP32 Slave initialise");
+}
+
+
+// =====================================
+// BOUCLE PRINCIPALE
+// =====================================
+
+void loop() {
+
+  // SIMULATION : changement de code toutes les 5 secondes
+  static unsigned long previousMillis = 0;
+
+  if (millis() - previousMillis >= 5000) {
+
+    previousMillis = millis();
+
+    errorCode++;
+
+    if (errorCode > ERR_UNKNOWN) {
+      errorCode = ERR_NONE;
+    }
+
+    Serial.print("Nouvelle erreur : ");
+    Serial.println(errorCode);
+  }
+}
